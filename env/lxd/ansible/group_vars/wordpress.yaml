@@ -1,0 +1,13 @@
+---
+wordpress_server_salt_auth_key:         'C+x`wA[d&2Aq}:t&(uBKhfl^6wKQn$XE`*L_}Tr+~- |ig-2L|hX|ycCj-`0UGD{'
+wordpress_server_salt_secure_auth_key:  '8:%O_0Uky)>,Mk8&~%2W|uQ%(jFZEBUVVb8fALD?2J6=](=cd3i|>|xKD`q(nwmH'
+wordpress_server_salt_logged_in_key:    '@gPB]jko8&ZLhz[<+~p]v<aP-JVDc`&HZ7m9hBx6~oNkKIiy(L5@vf_f[rl&w64<'
+wordpress_server_salt_nonce_key:        'RPXZk2sVOT,KJm0sWs ((sNM+qoo*JOL-C-L6#^YF#YblX81^dM|2$?]-w?$w-s6'
+wordpress_server_salt_auth_salt:        'W-g;#tni. ax{l%wt1`s+_oWVA0 :M(4,hP`f+uo# BH7q|*ArAu*B0qu>;-#=-g'
+wordpress_server_salt_secure_auth_salt: 'nYD=p*RDj^qLLxyS1aUubyXhZmH]n Dzd+%RIlAKTtLuh.JG~YHm{1=v>Fxfo3-f'
+wordpress_server_salt_logged_in_salt:   '=,x`FABC#zWuKi+*5nz2Th)l&0KhA15S[7XAa#U-CFZC*:DW[-{pi~55XP<:iB}|'
+wordpress_server_salt_nonce_salt:       '1#`Y@*epe4^|Ig<4?Q:JI4*D)%5BqJ35<+%VrN~xm=;o5{j 2Anmj.yhUh[tMkrL'
+
+wordpress_db_url: "no2"
+wordpress_server_dir: /srv/www/wordpress
+

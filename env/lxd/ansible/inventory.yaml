@@ -1,0 +1,10 @@
+wordpress:
+  hosts:
+    no1:
+      # per node settings
+      # ansible_user: ansible
+      # ansible_ssh_private_key: '/home/ansible/.ssh/id_ed25519'
+db:
+  hosts:
+    no2:
+
