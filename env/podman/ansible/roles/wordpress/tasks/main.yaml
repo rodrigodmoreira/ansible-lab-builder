@@ -1,0 +1,70 @@
+---
+- name: Create wordpress base directory if it does not exist
+  become: true
+  ansible.builtin.file:
+    path: '{{ wordpress_server_dir | dirname }}'
+    state: directory
+    owner: www-data
+    group: www-data
+- name: Unarchive wordpress server file that needs to be downloaded (added in 2.0)
+  become: true
+  ansible.builtin.unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: '{{ wordpress_server_dir | dirname }}'
+    remote_src: true
+- name: Copy apache conf file with owner and permissions
+  become: true
+  notify:
+    - restart apache
+  # ansible.builtin.copy:
+  ansible.builtin.template:
+    src: templates/wordpress.conf.j2
+    dest: /etc/apache2/sites-available/000-default.conf
+- name: Copy wordpress config file with owner and permissions
+  become: true
+  notify:
+    - restart apache
+  ansible.builtin.copy:
+    src: '{{ wordpress_server_dir }}/wp-config-sample.php'
+    dest: '{{ wordpress_server_dir }}/wp-config.php'
+    force: no
+    remote_src: true
+- name: Replace wordpress db name with wordpress_db (requires Ansible >= 2.4)
+  become: true
+  ansible.builtin.replace:
+    path: '{{ wordpress_server_dir }}/wp-config.php'
+    regexp: '{{ item.regexp }}'
+    replace: '{{ item.replace }}'
+  with_items:
+    - regexp: 'database_name_here'
+      replace: '{{ wordpress_db_name }}'
+    - regexp: 'localhost'
+      replace: '{{ wordpress_db_url }}'
+    - regexp: 'username_here'
+      replace: '{{ wordpress_db_user }}'
+    - regexp: 'password_here'
+      replace: '{{ wordpress_db_user_password }}'
+- name: Add salt to wordpress db registries
+  become: true
+  ansible.builtin.lineinfile:
+    path: '{{ wordpress_server_dir }}/wp-config.php'
+    search_string: '{{ item.search_string }}'
+    line: '{{ item.line }}'
+  with_items:
+    - search_string: "define( 'AUTH_KEY',         'put your unique phrase here' );"
+      line: "define('AUTH_KEY',         '{{ wordpress_server_salt_auth_key }}');"
+    - search_string: "define( 'SECURE_AUTH_KEY',  'put your unique phrase here' );"
+      line: "define('SECURE_AUTH_KEY',  '{{ wordpress_server_salt_secure_auth_key }}');"
+    - search_string: "define( 'LOGGED_IN_KEY',    'put your unique phrase here' );"
+      line: "define('LOGGED_IN_KEY',    '{{ wordpress_server_salt_logged_in_key }}');"
+    - search_string: "define( 'NONCE_KEY',        'put your unique phrase here' );"
+      line: "define('NONCE_KEY',        '{{ wordpress_server_salt_nonce_key }}');"
+    - search_string: "define( 'AUTH_SALT',        'put your unique phrase here' );"
+      line: "define('AUTH_SALT',        '{{ wordpress_server_salt_auth_salt }}');"
+    - search_string: "define( 'SECURE_AUTH_SALT', 'put your unique phrase here' );"
+      line: "define('SECURE_AUTH_SALT', '{{ wordpress_server_salt_secure_auth_salt }}');"
+    - search_string: "define( 'LOGGED_IN_SALT',   'put your unique phrase here' );"
+      line: "define('LOGGED_IN_SALT',   '{{ wordpress_server_salt_logged_in_salt }}');"
+    - search_string: "define( 'NONCE_SALT',       'put your unique phrase here' );"
+      line: "define('NONCE_SALT',       '{{ wordpress_server_salt_nonce_salt }}');"
+

@@ -1,15 +1,15 @@
 #!/bin/bash
 
-HOST_IMAGE="geerlingguy/docker-ubuntu2404-ansible"
-#NODE_IMAGE="geerlingguy/docker-debian12-ansible"
-NODE_IMAGE="geerlingguy/docker-ubuntu2404-ansible"
+HOST_IMAGE="docker.io/geerlingguy/docker-ubuntu2404-ansible"
+#NODE_IMAGE="docker.io/geerlingguy/docker-debian12-ansible"
+NODE_IMAGE="docker.io/geerlingguy/docker-ubuntu2404-ansible"
 
 SCRIPT_FOLDER=$(pwd)/$(dirname $0)/
 echo "script folder: $SCRIPT_FOLDER"
 cd $SCRIPT_FOLDER
 
 
-# dependencies: docker yq
+# dependencies: podman yq
 if [ -f /tmp/yq ]; then
   echo "skipping yq download"
 else
@@ -17,11 +17,11 @@ else
   chmod +x /tmp/yq
 fi
 
-# create docker network to resolve container names as dns
-if $(docker network list | grep lab-net 2>&1 1>/dev/null); then
+# create podman network to resolve container names as dns
+if $(podman network ls | grep lab-net 2>&1 1>/dev/null); then
   echo "skipping network creation"
 else
-  docker network create --driver bridge lab-net
+  podman network create --driver bridge lab-net
 fi
 
 # create nodes
@@ -31,10 +31,10 @@ function start_node() {
   BOOTSTRAP_SCRIPT=$3
 
   echo "Cleaning $CONTAINER_NAME"
-  docker rm -f $CONTAINER_NAME
+  podman rm -f $CONTAINER_NAME
 
   echo "Starting $CONTAINER_NAME"
-  docker run \
+  podman run \
     --name $CONTAINER_NAME \
     --privileged \
     --detach \
@@ -42,9 +42,11 @@ function start_node() {
     --network lab-net \
     --volume ${SCRIPT_FOLDER}bootstrap/$BOOTSTRAP_SCRIPT:/mnt/bootstrap.sh \
     --volume ${SCRIPT_FOLDER}ansible/:/mnt/ansible/ \
-    --entrypoint /bin/bash \
-    $CONTAINER_IMAGE \
-    -c "cp /mnt/bootstrap.sh /root/bootstrap.sh && chmod +x /root/bootstrap.sh && /root/bootstrap.sh && tail -f /dev/null"
+    --systemd=always \
+    --entrypoint /sbin/init \
+    $CONTAINER_IMAGE
+  sleep 1s
+  podman exec $CONTAINER_NAME /bin/bash -c "cp /mnt/bootstrap.sh /root/bootstrap.sh && chmod +x /root/bootstrap.sh && /root/bootstrap.sh"
 }
 
 # create nodes controlled by ansible
@@ -64,7 +66,7 @@ sleep 10s
 # until $(( nodes_ready == $NUM_NODES )); do
 #   nodes_ready=0
 #   for node in $NODES; do
-#     node_ready=$(docker logs $node | grep "> SSH READY" 2>&1 1>/dev/null | echo $?)
+#     node_ready=$(podman logs $node | grep "> SSH READY" 2>&1 1>/dev/null | echo $?)
 #     node_ready=$(( node_ready == 0 ))
 #     if $node_ready; then
 #       nodes_ready=$(( $nodes_ready + 1))

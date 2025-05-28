@@ -1,0 +1,12 @@
+- name: My first play
+  hosts:
+    - wordpress
+    - backend
+    - db
+  tasks:
+   - name: Ping my hosts
+     ansible.builtin.ping:
+
+   - name: Print message
+     ansible.builtin.debug:
+       msg: Hello world

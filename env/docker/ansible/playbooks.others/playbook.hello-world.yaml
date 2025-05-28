@@ -1,5 +1,8 @@
 - name: My first play
-  hosts: nodes
+  hosts:
+    - wordpress
+    - backend
+    - db
   tasks:
    - name: Ping my hosts
      ansible.builtin.ping:
