@@ -33,7 +33,7 @@
     - 'localhost'
     - '127.0.0.1'
     - '{{ wordpress_server_url }}'
-    - '{{ wordpress_server_url }}.lxd'
+    - '{{ wordpress_server_url }}.dns.podman'
 - name: Replace bind address to allow access from network (requires Ansible >= 2.4)
   become: true
   notify:

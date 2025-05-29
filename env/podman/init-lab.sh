@@ -46,7 +46,7 @@ function start_node() {
     --entrypoint /sbin/init \
     $CONTAINER_IMAGE
   sleep 1s
-  podman exec $CONTAINER_NAME /bin/bash -c "cp /mnt/bootstrap.sh /root/bootstrap.sh && chmod +x /root/bootstrap.sh && /root/bootstrap.sh"
+  podman exec -d $CONTAINER_NAME /bin/bash -c "cp /mnt/bootstrap.sh /root/bootstrap.sh && chmod +x /root/bootstrap.sh && /root/bootstrap.sh"
 }
 
 # create nodes controlled by ansible
